@@ -6,8 +6,9 @@
 [![pgvector](https://img.shields.io/badge/pgvector-vetores-blue)](https://github.com/pgvector/pgvector)
 [![OpenAI](https://img.shields.io/badge/OpenAI-embeddings-412991?logo=openai&logoColor=white)](https://openai.com)
 ![Deno](https://img.shields.io/badge/Edge_Function-Deno-black?logo=deno)
+![Status](https://img.shields.io/badge/status-produção-success)
 
-> 🔒 **Case anonimizado.** Sem nome de cliente, credenciais ou dados reais.
+> 🔒 **Case anonimizado.** Sem nome de cliente, credenciais ou dados reais. (Nomes de tabela/campo são ilustrativos.)
 
 ---
 
@@ -35,7 +36,7 @@ flowchart TD
     EDIT[✏️ Clínica edita info<br/>no dashboard] -->|trigger| FN[⚡ Edge Function<br/>generate-embedding]
     FN -->|monta texto:<br/>endereço, contato, descrição| TXT[Texto canônico]
     TXT -->|OpenAI text-embedding-3-small| EMB[Vetor 1536-d]
-    EMB --> DB[(Postgres + pgvector<br/>base_conhecimento_clinica)]
+    EMB --> DB[(Postgres + pgvector<br/>knowledge_base)]
     subgraph Consulta
       Q[❓ Pergunta do paciente] -->|embedding| SEARCH[Busca por similaridade]
       DB --> SEARCH
@@ -46,7 +47,7 @@ flowchart TD
 ### O fluxo de embedding
 
 - Uma **Edge Function** (Deno/Supabase) recebe o `id` do registro e o **schema** da clínica.
-- Monta um **texto canônico** concatenando os campos relevantes (`Localização`, `Endereço`, `Ponto de referência`, `WhatsApp`, `Telefone`, `Site`, `Conteúdo`).
+- Monta um **texto canônico** concatenando os campos relevantes (endereço, ponto de referência, contato, site e descrição).
 - Gera o embedding com o modelo `text-embedding-3-small` da OpenAI.
 - Grava o vetor + o texto + **metadados** (modelo usado, timestamp, tamanho do conteúdo) na tabela.
 - Tudo isolado por **schema** — cada clínica tem o seu, com uma allowlist validando o acesso.
@@ -73,14 +74,24 @@ flowchart TD
 
 ## 📈 Resultados
 
-> Exemplos do que medir:
-> - 🎯 Redução de respostas erradas/inventadas pela IA
-> - 🔄 Tempo pra colocar uma clínica nova no ar (cadastra info → já responde)
-> - 📚 Nº de perguntas respondidas sem escalar pra humano
+- 🎯 **Respostas ancoradas no dado real da clínica** — corta a alucinação (preço/endereço inventado).
+- 🔄 **Clínica nova entra rápido**: cadastra a info → o agente já responde sobre ela.
+- 📚 Mais dúvidas resolvidas sem escalar pra um humano.
+
+<!-- iTristaoo: se tiver número real, some aqui (ex: "X% menos respostas escaladas"). Não invente. -->
 
 ---
 
 ## 🔗 Projetos relacionados
 
 - [ai-receptionist-clinics](https://github.com/iTristaoo/ai-receptionist-clinics) — o agente que consome esta base
+- [ai-followup-automation](https://github.com/iTristaoo/ai-followup-automation) — usa esta base ao gerar as mensagens de reativação
 - [multitenant-clinic-dashboard](https://github.com/iTristaoo/multitenant-clinic-dashboard) — onde a clínica edita o conteúdo que vira embedding
+
+---
+
+## 📲 Quer um agente desses no seu negócio?
+
+**Construo automações e agentes de IA sob medida.** Bora conversar — me chama.
+
+<!-- iTristaoo: troque pelos seus links reais → ex: [WhatsApp](https://wa.me/55SEUNUMERO) · [Email](mailto:seu@email.com) -->
